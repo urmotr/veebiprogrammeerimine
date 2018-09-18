@@ -1,14 +1,13 @@
 <?php
-	//echo "See on minu esimene PHP!";
 	$firstName = "Urmot";
 	$lastName = "Rosenberg";
 	$dateToday = date("d.m.Y");
 	$hourNow = date("G");
 	$partOfDay = "";
-	if ($hourNow <= 8) {
+	if ($hourNow < 8) {
 		$partOfDay = "öö";
-	} if ($hourNow > 8 & $hourNow < 16) {
-		$partOfDay = "päev";
+	} if ($hourNow >= 8 & $hourNow < 16) {
+		$partOfDay = "koolipäev";
 	} else {
 		$partOfDay = "õhtu";
 	}
@@ -27,7 +26,6 @@
 	echo "<p>Tänane kuupäev on: ".$dateToday.". Praegu on ".$partOfDay." (".date("H:i:s").").</p>\n";
 	?>
 	<p>See on kodus lisatud rida</p>
-	<!--img src="http://greeny.cs.tlu.ee/~rinde/veebiprogrammeerimine2018s/tlu_terra_600x400_2.jpg" alt="TLÜ Terra õppehoone">-->
 	<img src="../../~rinde/veebiprogrammeerimine2018s/tlu_terra_600x400_2.jpg" alt="TLÜ Terra õppehoone">
 	<p>Mul on ka sõber, kes teeb oma <a href=../../~rolavag/>veebi</a></p>
 	<button onclick="location.href='http://www.tlu.ee'" type="button">
