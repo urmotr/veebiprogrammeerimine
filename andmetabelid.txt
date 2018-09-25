@@ -1,0 +1,2 @@
+anonüümsete sõnumite tabel
+CREATE TABLE `if18_urmot_ro_1`.`vpamsg` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `message` VARCHAR(256) NOT NULL , `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `accepted` INT(1) NULL , `acceptedby` INT(11) NULL , `accepttime` TIMESTAMP NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;

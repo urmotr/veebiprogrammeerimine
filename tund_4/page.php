@@ -1,17 +1,28 @@
 <?php
+	//kutsume välja funktsioonide faili
+	require("functions.php");
+	
 	$firstName = "Kodanik";
 	$lastName = "Tundmatu";
 	
 	//kontrollime, kas kasutaja on midagi lisanud
 	//var_dump($_POST);
 	if(isset($_POST["firstName"])){
-		$firstName = $_POST["firstName"];
+		//$firstName = $_POST["firstName"];
+		$firstName = test_input($_POST["firstName"]);
 	}
 	if(isset($_POST["lastName"])){
-		$lastName = $_POST["lastName"];
+		$lastName = test_input($_POST["lastName"]);
 	}
 	$monthNow = date("m");
 	$monthList =["jaanuar", "veebruar", "märts", "aprill", "mai", "juuni", "juuli", "august", "september", "oktoober", "november", "detsember"];
+
+	//Täiesti mõtetu harjutamiseks mõeldud funktsioon
+	function fullname(){
+			$GLOBALS["fullName"] = $GLOBALS["firstName"] . " " . $GLOBALS["lastName"];
+	}
+	$fullName = "";
+	fullname();
 ?>
 
 
@@ -26,7 +37,7 @@
 	<p>See leht on loodud <a href="http://www.tlu.ee" target="_blank"> TLÜ</a> õppetöö raames, ei pruugi parim välja näha ja kindlasti ei sialda tõsiselt võetavat sisu!</p>
 	<hr>
 	
-	<form method="POST">
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 	<label>Eesnimi</lable>
 	<input type="text" name="firstName">
 	<label>Perekonnanimi</lable>
@@ -40,8 +51,8 @@
 				echo '<option selected="selected" label="'.$monthList[$i].'">'.$monthList[$i].'</option>';
 				} else {
 				echo '<option label="'.$monthList[$i].'">'.$monthList[$i].'</option>';
+				}
 			}
-			};
 			?>
 	</select>
 	<input type="submit" name="submitUserData" value="Saada andmed">
@@ -50,7 +61,7 @@
 	
 	<?php
 		if(isset($_POST["firstName"])){
-		echo "<p>Olete elanud järgnevatel aastatel</p> \n";
+		echo "<p>".$fullName.", olete elanud järgnevatel aastatel:</p> \n";
 		echo "<ol> \n";
 			for($i = $_POST["birthYear"]; $i <= date("Y"); $i++) {
 				echo "<li>".$i."</li>";
