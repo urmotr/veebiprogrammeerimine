@@ -3,12 +3,15 @@
 	
 	$cats = listallcats();
 	
+	$notice = null;
+	
 	if(!empty($_POST["catname"]) and !empty($_POST["catcolor"])  and !empty($_POST["cattaillength"])) {
 			$catname = test_input($_POST["catname"]);
 			$catcolor = test_input($_POST["catcolor"]);
 			$cattaillength = test_input($_POST["cattaillength"]);
 			$notice = savecat($catname,$catcolor,$cattaillength);
 		} else {
+			$notice = null;
 		}		
 ?>
 
@@ -32,7 +35,7 @@
 	<input type="text" name="catcolor">
 	<br>
 	<label>Kiisu saba pikkus</lable>
-	<input type="text" name="cattaillength">
+	<input type="number" name="cattaillength">
 	<input type="submit" name="submitCat" value="Salvesta kiisu andmed">
 	</form>
 	<hr>

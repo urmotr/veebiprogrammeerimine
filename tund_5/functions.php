@@ -12,6 +12,29 @@
 	
 	$database = "if18_urmot_ro_1";
 	
+	
+	function signup($firstName,$lastName,$birthdate,$gender,$email,$password){
+		$notice = "";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		$stmt = $mysqli->prepare("INSERT INTO vpusers (firstname,lastname, birthdate, gender, email, password) VALUES(?,?,?,?,?,?)");
+		echo $mysqli->error;
+		//valmistame parooli ette salvestamiseks - krüpteerime, teeme räsi (hash)
+		$options = [
+			"cost" => 12,
+			"salt" => substr(sha1(rand()),0,22)
+		];
+		$pwdhash = password_hash($password, PASSWORD_BCRYPT, $options);
+		$stmt->bind_param("sssiss", $firstName,$lastName,$birthdate,$gender,$email,$pwdhash);
+		if($stmt->execute() == true){
+			$notice = 'Uue kasutaja lisamine õnnestus!';
+		} else {
+			$notice = "kasutaja lisamisel tekkis viga: ".$stmt->error;
+		}
+		$stmt->close();
+		$mysqli->close();
+		return $notice;
+	}
+	
 	//anonüümse sõnumi salvestamine
 	
 	function savecat($catname,$catcolor,$cattaillenght){
@@ -27,9 +50,10 @@
 		if($stmt->execute() == true){
 			$notice = 'Kiisu: "'.$catname.'" on salvestatud';
 		} else {
-			$notice = "Sõnumi salvestamisel tekkis tõrge: ".$stmt->error;
+			$notice = "Kiisu salvestamisel tekkis tõrge: ".$stmt->error;
 		}
 		$stmt->close();
+		$mysqli->close();
 		return $notice;
 	}
 	//anonüümse sõnumi lugemine
