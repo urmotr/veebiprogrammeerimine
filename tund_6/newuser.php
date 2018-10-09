@@ -62,16 +62,19 @@
 		} else {
 			$emailError = "Palun sisesta e-postiaadress";
 		}
-		if(isset($_POST["password"]) and !empty($_POST["password"] and strlen($_POST["password"]) > 8)){
-			if($_POST["confirmpassword"] == $_POST["password"]){
+		if(isset($_POST["password"]) and !empty($_POST["password"])){
+			if(strlen($_POST["password"]) < 8){
+			$passwordError = "Teie salasõna on liiga lühike"; 
+			}
 		} else {
+			$passwordError = "Palun sisestage salasõna";
+		}
+		if($_POST["confirmpassword"] == $_POST["password"]){
+		}else{
 			$confirmPasswordError = "Teie salasõnad ei ühildu";
 		}
-		} else {
-			$passwordError = "Palun sisesta sobilik salasõna";
-		}
 		//kui kõik on korras siis salvestan kasutaja
-		if(empty($firstNameError) and empty($lastNameError) and empty($birthDayError) and empty($birthMonthError) and empty($birthYearError) and empty($genderError) and empty($emailError) and empty($passwordError)){
+		if(empty($firstNameError) and empty($lastNameError) and empty($birthDayError) and empty($birthMonthError) and empty($birthYearError) and empty($genderError) and empty($emailError) and empty($passwordError) and empty($confirmPasswordError)){
 			$notice = signup($firstName,$lastName,$birthDate,$gender,$_POST["email"],$_POST["password"]);
 		}
 	}//kas vajutati nuppu - lõpp
