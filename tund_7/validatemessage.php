@@ -4,7 +4,7 @@
 		header("Location: index_1.php");
 		exit();
 	}
-	
+	$msg = null;
 	if(isset($_GET["logout"])){
 		session_destroy();
 		header("Location: index_1.php");
@@ -13,6 +13,11 @@
 	
 	if(isset($_GET["id"])) {
 		$msg = readmsgforvalidation($_GET["id"]);
+	}
+	if(isset($_POST["submitValidation"])){
+		$accepted = intval($_POST["validation"]);
+		$id = intval($_POST["id"]);
+		validatemsg($accepted,$id);
 	}
 ?>
 <!DOCTYPE html>

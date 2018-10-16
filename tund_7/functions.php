@@ -13,14 +13,51 @@
 	$database = "if18_urmot_ro_1";
 	session_start();
 	
-	function validatemsg($accepted, $userid, $timenow){
+	function allvalidmessages(){
 		$notice = "";
-		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);	
-		$stmt = $mysqli->prepare("UPDATE vpamsg SET accepted=?, acceptedby=?, accepttime=now() WHERE id=?");
-		$stmt->bind_param("is", $_POST["validation"], $_SESSION["userid"]);
+		$accepted = 1;
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		$stmt = $mysqli->prepare("SELECT message FROM vpamsg WHERE accepted = ?");
+		$stmt->bind_param("i", $accepted);
+		$stmt->bind_result($msg);
+		$stmt->execute();
+		while($stmt->fetch()){
+			$notice .= "<p>" .$msg ."</p> \n";
+		}
 		$stmt->close();
 		$mysqli->close();
 		return $notice;
+		}
+		
+	function userslist(){
+		$notice = "";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		$stmt = $mysqli->prepare("SELECT firstname, lastname, email FROM vpusers WHERE id != ?");
+		$stmt->bind_param("i", $_SESSION["userid"]);
+		$stmt->bind_result($firstname,$lastname,$email);
+		$stmt->execute();
+		while($stmt->fetch()){
+			$notice .= "<li>" .$firstname." ".$lastname." : ".$email."</li> \n";
+		}
+		$stmt->close();
+		$mysqli->close();
+		return $notice;
+	}
+	
+	function validatemsg($accepted, $id){
+		$notice = "";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);	
+		$stmt = $mysqli->prepare("UPDATE vpamsg SET accepted=?, acceptedby=?, accepttime=now() WHERE id=?");
+		$stmt->bind_param("iii", $accepted, $_SESSION["userid"],$id);
+		if($stmt->execute()){
+	  echo "Õnnestus";
+	  header("Location: validatemsg.php");
+	  exit();
+	} else {
+	  echo "Tekkis viga: " .$stmt->error;
+	}
+	$stmt->close();
+	$mysqli->close();
 	}
 	
 	function readmsgforvalidation($editId){
@@ -54,6 +91,25 @@
 	$mysqli->close();
 	return $notice;
   }
+	
+	function saveamsg($msg){
+		$notice = "";
+		//serveri ühendis (server, kasutaja, parool, andmebaas)
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		//valmistan ette mysql käsi
+		$stmt = $mysqli->prepare("INSERT INTO vpamsg (message) VALUES(?)");
+		echo $mysqli->error;
+		//asendame sql käsus "?" päris infoga ("andmetüüp", andmed ise)
+		//s - string, i - int, d - decimal(murdarv)
+		$stmt->bind_param("s", $msg);
+		if($stmt->execute() == true){
+			$notice = 'Sõnum: "'.$msg.'" on salvestatud';
+		} else {
+			$notice = "Sõnumi salvestamisel tekkis tõrge: ".$stmt->error;
+		}
+		$stmt->close();
+		return $notice;
+	}
 	
 	function signin($email,$password){
 		$notice = "";

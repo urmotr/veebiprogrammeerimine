@@ -25,8 +25,7 @@
 		<hr>
 		<p>Oled sisse loginud nimega: <?php echo $_SESSION["firstname"]. " ".$_SESSION["lastname"]."."; ?></p>
 		<ul>
-			<li><a href="validatemsg.php">Valideeri anonüümseid sõnumeid!</a></li>
-			<li><a href="?logout=1">Logi välja!</a></li>
+			<?php echo userslist(); ?>
 		</ul>
 	
 	</body>
