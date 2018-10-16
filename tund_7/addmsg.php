@@ -1,5 +1,6 @@
 <?php
 	require("functions.php");
+	require("design.php");
 	
 	$notice = null;
 	

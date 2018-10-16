@@ -1,5 +1,6 @@
 <?php
   require("functions.php");
+  require("design.php");
   if(!isset($_SESSION["userid"])){
 		header("Location: index_1.php");
 		exit();

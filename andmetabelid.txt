@@ -3,3 +3,6 @@ CREATE TABLE `if18_urmot_ro_1`.`vpamsg` ( `id` INT(11) NOT NULL AUTO_INCREMENT ,
 
 kasutajate tabel
 CREATE TABLE `if18_urmot_ro_1`.`vpusers` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(30) NOT NULL , `lastname` VARCHAR(30) NOT NULL , `birthdate` DATE NOT NULL , `gender` INT(1) NOT NULL , `email` VARCHAR(100) NOT NULL , `password` VARCHAR(60) NOT NULL , `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `if18_urmot_ro_1`. ( `id` INT NOT NULL AUTO_INCREMENT , `userID` INT NOT NULL , `description` VARCHAR(2500) NOT NULL , `bgcolor` VARCHAR(7) NOT NULL , `textcolor` VARCHAR(7) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+

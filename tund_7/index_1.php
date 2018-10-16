@@ -20,8 +20,7 @@
 	 $notice = signin($email, $_POST["password"]);
 	 } else {
 	  $notice = "Ei saa sisse logida!";
-  }
-  
+  } 
   }
 ?>
 <!DOCTYPE html>

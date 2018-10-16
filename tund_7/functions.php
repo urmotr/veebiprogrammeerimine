@@ -6,12 +6,100 @@
 		$data = htmlspecialchars($data);
 		return $data;
 	}
+	
 	//laen andmebaasi info
 	require("../../../config.php");
 	//echo $GLOBALS["serverUsername"];
 	
 	$database = "if18_urmot_ro_1";
 	session_start();
+	
+	function mydescription(){
+		$notice = "";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		$stmt = $mysqli->prepare("SELECT description, bgcolor, textcolor FROM profiil WHERE userID=?");
+		echo $mysqli->error;
+		$stmt->bind_param("i", $_SESSION["userid"]);
+		$stmt->bind_result($description,$bgcolor,$textcolor);
+		$stmt->execute();
+		$stmt->store_result();
+		if($stmt->fetch()){
+			$notice = array($description,$bgcolor,$textcolor);
+			$_SESSION["bgcolor"] = $bgcolor;
+			$_SESSION["textcolor"] = $textcolor;
+		} else {
+			$notice = array("Pole iseloomustust lisanud.","#FFFFFF","#000000");
+		}
+		$stmt->close();
+		$mysqli->close();
+		return $notice;
+	}
+	
+	function savemydescription($description1,$bgcolor1,$textcolor1){
+		$notice = "";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		$stmt = $mysqli->prepare("SELECT description, bgcolor, textcolor FROM profiil WHERE userID=?");
+		echo $mysqli->error;
+		$stmt->bind_param("i", $_SESSION["userid"]);
+		$stmt->bind_result($description,$bgcolor,$textcolor);
+		$stmt->execute();
+		$stmt->store_result();
+		if($stmt->fetch()){
+			$stmt2 = $mysqli->prepare("UPDATE profiil SET userID=?, description=?, bgcolor=?,textcolor=? WHERE userID=?");
+			$stmt2->bind_param("isssi", $_SESSION["userid"], $description1, $bgcolor1, $textcolor1 ,$_SESSION["userid"]);
+			if($stmt2->execute()){
+				header("Location: userprofile.php");
+				exit();
+			}
+		} else {
+			$stmt2 = $mysqli->prepare("INSERT INTO profiil (userID, description,bgcolor,textcolor) VALUES(?,?,?,?)");
+			echo $mysqli->error;
+			$stmt2->bind_param("isss", $_SESSION["userid"],$description1,$bgcolor1,$textcolor1);
+			$stmt2->execute();
+			$notice = "Salvestamine õnnestus";
+		}
+		$stmt2->close();
+		$stmt->close();
+		$mysqli->close();
+		return $notice;
+	}
+	
+	function readallvalidatedmessagesbyuser(){
+		$msghtmlfull = "";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+		$stmt = $mysqli->prepare("SELECT id, firstname, lastname FROM vpusers");
+		echo $mysqli->error;
+		$stmt->bind_result($userIdFromDb,$firstNameFromDb,$lastNameFromDb);
+		$stmt2 = $mysqli->prepare("SELECT message, accepted FROM vpamsg WHERE acceptedby=?");
+		echo $mysqli->error;
+		$stmt2->bind_param("i", $userIdFromDb);
+		$stmt2->bind_result($messageFromDb,$acceptedFromDb);
+		$stmt->execute();
+		$stmt->store_result();
+		while($stmt->fetch()){
+			$count = 0;
+			$msghtml = "";
+			$msghtml .= "<h3>".$firstNameFromDb." ".$lastNameFromDb."</h3> \n";
+			$stmt2->execute();
+			while($stmt2->fetch()){
+				$count = 1;
+				$msghtml .= "<p><b>";
+				if($acceptedFromDb == 1){
+					$msghtml.= "Lubatud" ;
+					} else {
+					$msghtml.= "Keelatud" ;
+					}
+				$msghtml .= ": </b>".$messageFromDb."</p> \n";
+			}
+			if($count != 0){
+				$msghtmlfull .= $msghtml;
+			}
+		}
+		$stmt2->close();
+		$stmt->close();
+		$mysqli->close();
+		return $msghtmlfull;
+	}
 	
 	function allvalidmessages(){
 		$notice = "";
@@ -27,7 +115,7 @@
 		$stmt->close();
 		$mysqli->close();
 		return $notice;
-		}
+	}
 		
 	function userslist(){
 		$notice = "";
@@ -143,8 +231,24 @@
 		$mysqli->close();
 		return $notice;
 	}
-	
-	
+	function loadprofile(){
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);	
+		$stmt = $mysqli->prepare("SELECT description, bgcolor, textcolor FROM profiil WHERE userID=?");
+		echo $mysqli->error;
+		$stmt->bind_param("i", $_SESSION["userid"]);
+		$stmt->bind_result($description,$bgcolor,$textcolor);
+		$stmt->execute();
+		$stmt->store_result();
+		if($stmt->fetch()){
+			$_SESSION["bgcolor"] = $bgcolor;
+			$_SESSION["textcolor"] = $textcolor;
+		} else {
+			$_SESSION["bgcolor"] = "#FFFFFF";
+			$_SESSION["textcolor"] = "#000000";
+		}
+		$stmt->close();
+		$mysqli->close();
+	}
 	function signup($firstName,$lastName,$birthdate,$gender,$email,$password){
 		$notice = "";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);	
