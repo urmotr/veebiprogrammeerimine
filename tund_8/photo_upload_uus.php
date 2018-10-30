@@ -13,6 +13,7 @@
 		exit();
 	}
 	
+	$notice = "";
 	$target_dir = "../vp_pic_uploads/";
 	$uploadOk = 1;
 	// Check if image file is a actual image or fake image
@@ -25,25 +26,25 @@
 			//$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 			$check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
 			if($check !== false) {
-				echo "See on " . $check["mime"] . " pilt.";
+				$notice = "";
 			} else {
-				echo "See ei ole pilt.";
+				$notice = "See ei ole pilt.";
 				$uploadOk = 0;
 			}
 			// Check file size
 			if ($_FILES["fileToUpload"]["size"] > 50000000) {
-				echo "Vabandage, pilt on liiga suur.";
+				$notice = "Vabandage, pilt on liiga suur.";
 				$uploadOk = 0;
 			}
 			// Allow certain file formats
 			if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
 			&& $imageFileType != "gif" ) {
-				echo "Vabandage, ainult JPG, JPEG, PNG ja GIF failid on lubatud.";
+				$notice = "Vabandage, ainult JPG, JPEG, PNG ja GIF failid on lubatud.";
 				$uploadOk = 0;
 			}
 			// Check if $uploadOk is set to 0 by an error
 			if ($uploadOk == 0) {
-				echo "Vabandage, valitud faili ei saa üles laadida.";
+				$notice = "Vabandage, valitud faili ei saa üles laadida.";
 			// if everything is ok, try to upload file
 			} else {
 				if($imageFileType = "jpg" or $imageFileType = "jpeg"){
@@ -70,23 +71,23 @@
 				
 				if($imageFileType = "jpg" or $imageFileType = "jpeg"){
 					if(imagejpeg($myImage, $target_file, 90)){
-						echo "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
+						$notice = "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
 					} else {
-						echo "Vabandage, tekkis tehniline viga.";
+						$notice = "Vabandage, tekkis tehniline viga.";
 					}
 				}
 				else if($imageFileType = "png"){
 					if(imagepng($myImage, $target_file, 6)){
-						echo "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
+						$notice = "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
 					} else {
-						echo "Vabandage, tekkis tehniline viga.";
+						$notice = "Vabandage, tekkis tehniline viga.";
 					}
 				}
 				else if($imageFileType = "gif"){
 					if(imagegif($myImage, $target_file)){
-						echo "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
+						$notice = "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
 					} else {
-						echo "Vabandage, tekkis tehniline viga.";
+						$notice = "Vabandage, tekkis tehniline viga.";
 					}
 				}
 				imagedestroy($myTempImage);
@@ -119,7 +120,8 @@
 	<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
 		<label>Vali üleslaetava pildi fail:</label><br>
 		<input type="file" name="fileToUpload" id="fileToUpload"><br>
-		<input type="submit" value="Lae pilt üles" name="submitImage">
+		<input type="submit" value="Lae pilt üles" name="submitImage"><br>
+		<?php echo $notice;?>
 	</form>
 	</body>
 </html>
