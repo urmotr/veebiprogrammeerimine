@@ -6,3 +6,7 @@ CREATE TABLE `if18_urmot_ro_1`.`vpusers` ( `id` INT(11) NOT NULL AUTO_INCREMENT 
 
 CREATE TABLE `if18_urmot_ro_1`. ( `id` INT NOT NULL AUTO_INCREMENT , `userID` INT NOT NULL , `description` VARCHAR(2500) NOT NULL , `bgcolor` VARCHAR(7) NOT NULL , `textcolor` VARCHAR(7) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
+CREATE TABLE `if18_urmot_ro_1`.`vpphotos` ( `id` INT NOT NULL AUTO_INCREMENT , `userid` INT NOT NULL , `filename` VARCHAR(40) NOT NULL , `created` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP , `alttext` VARCHAR NULL , `privacy` INT(1) NOT NULL , `delted` DATE NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `if18_urmot_ro_1`.`profilepic` ( `id` INT NOT NULL AUTO_INCREMENT , `userid` INT NOT NULL , `picname` VARCHAR(40) NOT NULL , `created` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP , `deleted` DATE NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
