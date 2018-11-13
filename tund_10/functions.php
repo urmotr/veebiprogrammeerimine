@@ -59,7 +59,6 @@
 			} else{
 				echo "Appi";
 			}
-			echo $picid;
 			return $notice;
 			header("Location: userprofile.php");
 			exit();

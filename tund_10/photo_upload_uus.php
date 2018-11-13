@@ -2,6 +2,7 @@
 	require("functions.php");
 	require("design.php");
 	
+	
 	if(!isset($_SESSION["userid"])){
 		header("Location: index_1.php");
 		exit();
@@ -12,6 +13,13 @@
 		header("Location: index_1.php");
 		exit();
 	}
+	
+	require("classes/Photo_upload.class.php");
+	/*require("classes/Test.class.php");
+	$myTest = new Test(4);
+	echo $myTest->publicNumber;
+	echo $myTest->tellInfo();
+	unset($myTest);*/
 	
 	$notice = "";
 	$target_dir = "../vp_pic_uploads/";
@@ -47,83 +55,22 @@
 				$notice = "Vabandage, valitud faili ei saa üles laadida.";
 			// if everything is ok, try to upload file
 			} else {
-				if($imageFileType = "jpg" or $imageFileType = "jpeg"){
-					$myTempImage = imagecreatefromjpeg($_FILES["fileToUpload"]["tmp_name"]);
-				}
-				else if($imageFileType = "png"){
-					$myTempImage = imagecreatefrompng($_FILES["fileToUpload"]["tmp_name"]);
-				}
-				else if($imageFileType = "gif"){
-					$myTempImage = imagecreatefromgif($_FILES["fileToUpload"]["tmp_name"]);
-				}
-				$imageWidth = imagesx($myTempImage);
-				$imageHeight = imagesy($myTempImage);
-				if($imageWidth > $imageHeight){
-					$sizeRatio = $imageWidth / 600;
+				$myPhoto = new Photo_upload($_FILES["fileToUpload"]["tmp_name"], $imageFileType);
+				$myPhoto->changePhotoSize(600,400);
+				$myPhoto->addWatermark();
+				$myPhoto->addTextWatermark();
+				$noticed = $myPhoto->savePhoto($target_file);
+				unset($myPhoto);
+				if($noticed = 1){
+					addPhotoData($target_file_name,$_POST["altText"],$_POST["privacy"]);
 				} else {
-					$sizeRatio = $imageHeight / 400;
+					$notice = "Vabandame, tekkis viga";
 				}
 				
-				$newWidth = round($imageWidth / $sizeRatio);
-				$newHeight = round($imageHeight / $sizeRatio);
-				
-				$myImage = resizeImage($myTempImage, $imageWidth, $imageHeight, $newWidth, $newHeight);
-				
-				//Vesimärgi lisamine
-				$waterMark = imagecreatefrompng("../vp_picfiles/vp_logo_w100_overlay.png");
-				$waterMarkWidth = imagesx($waterMark);
-				$waterMarkHeight = imagesy($waterMark);
-				$waterMarkPosX = $newWidth - $waterMarkWidth - 10;
-				$waterMarkPosY = $newHeight - $waterMarkHeight - 10;
-				imageCopy($myImage,$waterMark,$waterMarkPosX,$waterMarkPosY,0,0,$waterMarkWidth,$waterMarkHeight);
-				
-				//Tekstvesimärgi lisamine
-				$textToImage = "Veebiprogrammeerimine";
-				$textColor = imagecolorallocatealpha($myImage,255,155,0,60);
-				imagettftext($myImage,16,0,10,$waterMarkPosY+$waterMarkHeight,$textColor,"../vp_picfiles/ARIALBD.TTF",$textToImage);
-				
-				
-				//Faili salvestamine
-				if($imageFileType = "jpg" or $imageFileType = "jpeg"){
-					if(imagejpeg($myImage, $target_file, 90)){
-						$notice = "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
-						addPhotoData($target_file_name,$_POST["altText"],$_POST["privacy"]);
-					} else {
-						$notice = "Vabandage, tekkis tehniline viga.";
-					}
 				}
-				else if($imageFileType = "png"){
-					if(imagepng($myImage, $target_file, 6)){
-						$notice = "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
-						addPhotoData($target_file_name,$_POST["altText"],$_POST["privacy"]);
-					} else {
-						$notice = "Vabandage, tekkis tehniline viga.";
-					}
-				}
-				else if($imageFileType = "gif"){
-					if(imagegif($myImage, $target_file)){
-						$notice = "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
-						addPhotoData($target_file_name,$_POST["altText"],$_POST["privacy"]);
-					} else {
-						$notice = "Vabandage, tekkis tehniline viga.";
-					}
-				}
-				imagedestroy($myTempImage);
-				imagedestroy($myImage);
-				imagedestroy($waterMark);
-				/*if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-					echo "Fail ". basename( $_FILES["fileToUpload"]["name"]). " laeti edukalt üles.";
-				} else {
-					echo "Vabandage, tekkis tehniline viga.";
-				}*/
 			}
 		}
-	}
-	function resizeImage($image, $ow, $oh, $w, $h){
-		$newImage = imagecreatetruecolor($w, $h);
-		imagecopyresampled($newImage,$image,0,0,0,0,$w,$h,$ow,$oh);
-		return $newImage;
-	}
+	
 	$pagetitle = "Fotode üleslaadimine";
 	require("header.php");
 ?>

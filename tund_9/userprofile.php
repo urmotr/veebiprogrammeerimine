@@ -23,7 +23,6 @@
 		$picaddress =  "../vp_picfiles/vp_user_generic.png";
 	} else {
 		$picaddress =  "../vp_profile_pics/".$profilepic;
-		echo $picaddress;
 	}
 	$description = mydescription();
 	$mydescription = $description[0];

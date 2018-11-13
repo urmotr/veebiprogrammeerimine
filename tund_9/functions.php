@@ -55,11 +55,11 @@
 			$stmt2->bind_param("ii", $picid, $_SESSION["userid"]);
 			if($stmt2->execute()){
 				$notice = "Salvestamine õnnestus";
-				echo $mysqli->error;
+				header("Location: userprofile.php");
+				exit();
 			} else{
 				echo "Appi";
 			}
-			echo $picid;
 			return $notice;
 			header("Location: userprofile.php");
 			exit();
@@ -78,8 +78,7 @@
 			$privacy = 3;
 		}
 		$stmt->bind_param("issi", $_SESSION["userid"],$fileName,$altText,$privacy);
-		if($stmt->execute()){
-			
+		if($stmt->execute()){	
 			$notice = "Salvestamine õnnestus";
 		}else{
 			$notice = "Kõik on pahasti";
