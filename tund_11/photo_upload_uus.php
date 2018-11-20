@@ -22,59 +22,67 @@
 	unset($myTest);*/
 	
 	$notice = "";
-	$target_dir = "../vp_pic_uploads/";
+	$target_dir = $picDir;
+	$thumb_dir = $thumbDir;
+	$thumbSize = 100;
+	$target_file = "";
 	$uploadOk = 1;
+	//$imageFileType = "";
+	$imageNamePrefix = "vp_";
+    $textToImage = "Veebiprogrammeerimine";
+    $pathToWatermark = "../vp_picfiles/vp_logo_w100_overlay.png";
 	// Check if image file is a actual image or fake image
 	if(isset($_POST["submitImage"])) {
 		if(!empty($_FILES["fileToUpload"]["tmp_name"])){
-			$imageFileType = strtolower(pathinfo(basename($_FILES["fileToUpload"]["name"]),PATHINFO_EXTENSION));
-			$timeStamp = microtime(1) * 10000;
-			$target_file_name = "vp_".$timeStamp.".".$imageFileType;
-			$target_file = $target_dir . $target_file_name;
-			//$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-			$check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-			if($check !== false) {
-				$notice = "";
-			} else {
-				$notice = "See ei ole pilt.";
-				$uploadOk = 0;
+			$myPhoto = new Photoupload($_FILES["fileToUpload"]);
+			$myPhoto->readExif();
+			$myPhoto->makeFileName($imageNamePrefix);
+			//määrame faili nime
+			$target_file = $target_dir .$myPhoto->fileName;
+			
+			//kas on pilt
+			$uploadOk = $myPhoto->checkForImage();
+			if($uploadOk == 1){
+			  // kas on sobiv tüüp
+			  $uploadOk = $myPhoto->checkForFileType();
 			}
-			// Check file size
-			if ($_FILES["fileToUpload"]["size"] > 50000000) {
-				$notice = "Vabandage, pilt on liiga suur.";
-				$uploadOk = 0;
+			
+			if($uploadOk == 1){
+			  // kas on sobiv suurus
+			  $uploadOk = $myPhoto->checkForFileSize($_FILES["fileToUpload"], 2500000);
 			}
-			// Allow certain file formats
-			if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-			&& $imageFileType != "gif" ) {
-				$notice = "Vabandage, ainult JPG, JPEG, PNG ja GIF failid on lubatud.";
-				$uploadOk = 0;
+			
+			if($uploadOk == 1){
+			  // kas on juba olemas
+			  $uploadOk = $myPhoto->checkIfExists($target_file);
 			}
-			// Check if $uploadOk is set to 0 by an error
+						
+			// kui on tekkinud viga
 			if ($uploadOk == 0) {
-				$notice = "Vabandage, valitud faili ei saa üles laadida.";
-			// if everything is ok, try to upload file
+				$notice = "Vabandame, faili ei laetud üles! Tekkisid vead: ".$myPhoto->errorsForUpload;
+			// kui kõik korras, laeme üles
 			} else {
-				$myPhoto = new Photo_upload($_FILES["fileToUpload"]["tmp_name"], $imageFileType);
-				$myPhoto->changePhotoSize(600,400);
-				$myPhoto->addWatermark();
-				$text = $_POST["text"];
-				$myPhoto->addTextWatermark($text);
-				$noticed = $myPhoto->savePhoto($target_file);
-				unset($myPhoto);
-				if($noticed = 1){
-					addPhotoData($target_file_name,$_POST["altText"],$_POST["privacy"]);
-					$notice = "Pilt edukalt üles laetud";
+				$myPhoto->createThumbnail($thumb_dir,$thumbSize);
+				$myPhoto->resizeImage(600, 400);
+				$myPhoto->addWatermark($pathToWatermark);
+				$myPhoto->addText();
+				$saveResult = $myPhoto->savePhoto($target_file);
+				//kui salvestus õnnestus, lisame andmebaasi
+				if($saveResult == 1){
+				  $notice = "Foto laeti üles! ";
+				  $notice .= addPhotoData($myPhoto->fileName, $_POST["altText"], $_POST["privacy"]);
 				} else {
-					$notice = "Vabandame, tekkis viga";
-				}
+                  $notice .= "Foto lisamisel andmebaasi tekkis viga!";
+                }
 				
-				}
 			}
-		}
-	
-	$pagetitle = "Fotode üleslaadimine";
-	require("header.php");
+			unset($myPhoto);
+		}//ega failinimi tühi pole
+	}//kas on submit nuppu vajutatud
+  
+  //lehe päise laadimise osa
+  $pagetitle = "Fotode üleslaadimine";
+  require("header.php");
 ?>
 
 		<p>See leht on valminud <a href="http://www.tlu.ee" target="_blank">TLÜ</a> õppetöö raames ja ei oma mingisugust, mõtestatud või muul moel väärtuslikku sisu.</p>
@@ -90,8 +98,6 @@
 		<input type="file" name="fileToUpload" id="fileToUpload"><br>
 		<label>Alt tekst: </label>
 		<input type="text" name="altText"><br>
-		<label>Vesimärgi tekst: </label>
-		<input type="text" name="text"><br>
 		<label>Määra pildi kasutusõigused</label><br>
 		<input type="radio" name="privacy" value="1"><label> Avalik pilt</label>
 		<input type="radio" name="privacy" value="2"><label> Ainult sisseloginud kasutajatele</label>

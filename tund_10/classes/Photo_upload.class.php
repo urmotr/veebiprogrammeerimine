@@ -50,14 +50,14 @@
 			$waterMark = imagecreatefrompng("../vp_picfiles/vp_logo_w100_overlay.png");
 			$waterMarkWidth = imagesx($waterMark);
 			$waterMarkHeight = imagesy($waterMark);
-			$waterMarkPosX = imagesx($this->myTempImage) - $waterMarkWidth - 10;
-			$waterMarkPosY = imagesy($this->myTempImage) - $waterMarkHeight - 10;
+			$waterMarkPosX = imagesx($this->myImage) - $waterMarkWidth - 10;
+			$waterMarkPosY = imagesy($this->myImage) - $waterMarkHeight - 10;
 			imageCopy($this->myImage,$waterMark,$waterMarkPosX,$waterMarkPosY,0,0,$waterMarkWidth,$waterMarkHeight);
 		}
-		public function addTextWatermark(){
+		public function addTextWatermark($text){
 			//Tekstvesimärgi lisamine
-			$textToImage = "Veebiprogrammeerimine";
-			$textColor = imagecolorallocatealpha($this->myImage,255,155,0,60);
+			$textToImage = $text;
+			$textColor = imagecolorallocatealpha($this->myImage,255,255,111,60);
 			imagettftext($this->myImage,16,0,10,40,$textColor,"../vp_picfiles/ARIALBD.TTF",$textToImage);
 		}
 		public function savePhoto($target_file){
